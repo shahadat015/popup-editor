@@ -56,9 +56,7 @@ function setPopupData() {
   }
 
   try {
-    let parsedPopup = JSON.parse(savedPopup);
-
-    popup = { ...parsedPopup };
+    Object.assign(popup, JSON.parse(savedPopup));
   } catch (error) {
     console.log(error);
   }
@@ -561,51 +559,56 @@ watch(
     </div>
   </Popup>
   <Popup :open="previewModal" @close="previewModal = false">
-    <div
-      class="relative grid place-items-center rounded-full"
-      :style="{
-        width: popup.width + 'px',
-        height: popup.height + 'px',
-        backgroundColor: popup.bg_color,
-      }"
-    >
+    <div class="grid place-items-center min-h-[calc(100vh-150px)]">
       <div
-        class="flex flex-col items-center rounded-full border-4 border-white"
+        class="relative grid place-items-center rounded-full"
         :style="{
-          width: popup.width - popup.padding + 'px',
-          height: popup.height - popup.padding + 'px',
+          width: popup.width + 'px',
+          height: popup.height + 'px',
+          backgroundColor: popup.bg_color,
         }"
       >
-        <template v-for="element in elements">
-          <img
-            v-if="element.type == 'image'"
-            :class="element.class"
-            :style="element.style"
-            :src="element.src"
-            :alt="element.alt"
-          />
-
+        <div
+          class="rounded-full border-4 border-white"
+          :style="{
+            width: popup.width - popup.padding + 'px',
+            height: popup.height - popup.padding + 'px',
+          }"
+        >
           <div
-            v-if="element.type == 'text'"
-            :style="element.style"
-            v-html="element.content"
-          ></div>
+            v-for="element in elements"
+            :class="element.class"
+            class="flex flex-col items-center group"
+          >
+            <img
+              v-if="element.type == 'image'"
+              :style="element.style"
+              :src="element.src"
+              :alt="element.alt"
+            />
 
-          <input
-            v-if="element.type == 'input'"
-            class="focus:outline-none"
-            :style="element.style"
-            :type="element.inputType"
-            :placeholder="element.placeholder"
-          />
+            <div
+              v-if="element.type == 'text'"
+              :style="element.style"
+              v-html="element.content"
+            ></div>
 
-          <button
-            v-if="element.type == 'button'"
-            class="btn-submit focus:outline-none"
-            :style="[btnStyle, element.style]"
-            v-html="element.content"
-          ></button>
-        </template>
+            <input
+              v-if="element.type == 'input'"
+              class="focus:outline-none"
+              :style="element.style"
+              :type="element.inputType"
+              :placeholder="element.placeholder"
+            />
+
+            <button
+              v-if="element.type == 'button'"
+              class="btn-submit focus:outline-none"
+              :style="[btnStyle, element.style]"
+              v-html="element.content"
+            ></button>
+          </div>
+        </div>
       </div>
     </div>
   </Popup>
