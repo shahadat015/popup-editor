@@ -83,7 +83,7 @@ function getDefaultElements() {
     {
       id: uniqueId(),
       type: "image",
-      src: getImageUrl("../assets/stars.png"),
+      src: "/stars.png",
       alt: "stars",
       class: "draggable",
       style: {
@@ -242,10 +242,6 @@ function removeElement(item) {
   elements.splice(index, 1);
 }
 
-function getImageUrl(src) {
-  return new URL(src, import.meta.url).href;
-}
-
 function uniqueId() {
   return Math.random().toString(36).slice(2);
 }
@@ -280,10 +276,6 @@ watch(
     }
   }
 );
-
-// function onDrop(e, element) {
-//   console.log(e.target.style.top);
-// }
 </script>
 
 <template>
