@@ -1,9 +1,10 @@
 <script setup>
-import { computed, onMounted, reactive, ref, watch } from "vue";
+import { computed, nextTick, onMounted, reactive, ref, watch } from "vue";
 import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/vue";
 import Fileupload from "../components/Fileupload.vue";
 import Toast from "../components/Toast.vue";
 import Popup from "../components/Popup.vue";
+import DragIcon from "../components/icons/Drag.vue";
 import {
   ChevronUpIcon,
   QuestionMarkCircleIcon,
@@ -12,22 +13,18 @@ import {
   CursorArrowRippleIcon,
   PhotoIcon,
   TrashIcon,
+  DevicePhoneMobileIcon,
+  ComputerDesktopIcon,
 } from "@heroicons/vue/24/solid";
 
 let imageModal = ref(false);
 let previewModal = ref(false);
 let saveSuceess = ref(false);
-let file = ref(null);
+let image = ref(null);
+let openMenu = ref(null);
+let device = ref("desktop");
 
-let popup = reactive({
-  width: 500,
-  height: 500,
-  bg_color: "#df795e",
-  btn_color: "#414142",
-  btn_hover_color: "#7661df",
-  padding: 16,
-  constrains: true,
-});
+let popup = reactive({});
 let elements = reactive([]);
 
 const btnStyle = computed(() => {
@@ -40,19 +37,49 @@ const btnStyle = computed(() => {
 onMounted(() => {
   setPopupData();
   setPopupElements();
+  initDraggable();
 });
 
+function openActionMenu(id) {
+  openMenu.value = id;
+}
+
 function savePopup() {
-  localStorage.setItem("popup", JSON.stringify(popup));
-  localStorage.setItem("elements", JSON.stringify(elements));
-  saveSuceess.value = true;
+  try {
+    localStorage.setItem(getPopupStorageKey(), JSON.stringify(popup));
+    localStorage.setItem(getElementsStorageKey(), JSON.stringify(elements));
+
+    saveSuceess.value = true;
+  } catch (error) {
+    console.log(error);
+  }
 }
 
 function setPopupData() {
-  let savedPopup = localStorage.getItem("popup");
+  let savedPopup = localStorage.getItem(getPopupStorageKey());
 
   if (!savedPopup) {
-    return;
+    if (device.value == "desktop") {
+      return Object.assign(popup, {
+        width: 500,
+        height: 500,
+        bg_color: "#df795e",
+        btn_color: "#414142",
+        btn_hover_color: "#7661df",
+        padding: 16,
+        constrains: true,
+      });
+    } else {
+      return Object.assign(popup, {
+        width: 350,
+        height: 350,
+        bg_color: "#df795e",
+        btn_color: "#414142",
+        btn_hover_color: "#7661df",
+        padding: 8,
+        constrains: true,
+      });
+    }
   }
 
   try {
@@ -63,7 +90,9 @@ function setPopupData() {
 }
 
 function setPopupElements() {
-  let savedElements = localStorage.getItem("elements");
+  let savedElements = localStorage.getItem(getElementsStorageKey());
+
+  elements.length = 0;
 
   if (!savedElements) {
     return elements.push(...getDefaultElements());
@@ -77,16 +106,105 @@ function setPopupElements() {
 }
 
 function getDefaultElements() {
+  if (device.value == "desktop") {
+    return [
+      {
+        id: uniqueId(),
+        type: "image",
+        src: "/stars.png",
+        alt: "stars",
+        position: {
+          position: "absolute",
+          top: "30px",
+          left: "160px",
+        },
+        style: {
+          width: "145px",
+          height: "45px",
+        },
+      },
+      {
+        id: uniqueId(),
+        type: "text",
+        content:
+          "All the text and elements in this popup should be editable and draggable",
+        position: {
+          position: "absolute",
+          top: "100px",
+          left: "60px",
+        },
+        style: {
+          width: "354px",
+          textAlign: "center",
+          color: "#fff",
+          fontSize: "26px",
+          fontWeight: "bold",
+        },
+      },
+      {
+        id: uniqueId(),
+        type: "input",
+        inputType: "email",
+        placeholder: "E-mail",
+        position: {
+          position: "absolute",
+          top: "230px",
+          left: "60px",
+        },
+        style: {
+          width: "354px",
+          padding: "12px 16px",
+          borderRadius: "16px",
+        },
+      },
+      {
+        id: uniqueId(),
+        type: "button",
+        content: "Signup Now",
+        position: {
+          position: "absolute",
+          top: "300px",
+          left: "60px",
+        },
+        style: {
+          width: "354px",
+          padding: "12px 16px",
+          borderRadius: "16px",
+          textTransform: "uppercase",
+          color: "#fff",
+          fontSize: "16px",
+          fontWeight: 700,
+        },
+      },
+      {
+        id: uniqueId(),
+        type: "text",
+        content: "No credit card required. No surprises",
+        position: {
+          position: "absolute",
+          top: "360px",
+          left: "90px",
+        },
+        style: {
+          color: "#fff",
+          margingTop: "10px",
+        },
+      },
+    ];
+  }
+
   return [
     {
       id: uniqueId(),
       type: "image",
       src: "/stars.png",
       alt: "stars",
-      class: "draggable",
+      position: {
+        position: "absolute",
+        top: "20px",
+        left: "90px",
+      },
       style: {
-        position: "relative",
-        top: "30px",
         width: "145px",
         height: "45px",
       },
@@ -95,15 +213,17 @@ function getDefaultElements() {
       id: uniqueId(),
       type: "text",
       content:
-        "All the text and elements in this popup should be editable and dragable",
-      class: "draggable",
+        "All the text and elements in this popup should be editable and draggable",
+      position: {
+        position: "absolute",
+        top: "80px",
+        left: "15px",
+      },
       style: {
-        position: "relative",
-        top: "60px",
-        maxWidth: "354px",
+        width: "300px",
         textAlign: "center",
         color: "#fff",
-        fontSize: "26px",
+        fontSize: "20px",
         fontWeight: "bold",
       },
     },
@@ -112,14 +232,14 @@ function getDefaultElements() {
       type: "input",
       inputType: "email",
       placeholder: "E-mail",
-      class: "draggable",
+      position: {
+        position: "absolute",
+        top: "185px",
+        left: "25px",
+      },
       style: {
-        position: "relative",
-        top: "80px",
-        maxWidth: "354px",
-        width: "100%",
-        maxWidth: "354px",
-        padding: "12px 16px",
+        width: "280px",
+        padding: "10px 12px",
         borderRadius: "16px",
       },
     },
@@ -127,13 +247,14 @@ function getDefaultElements() {
       id: uniqueId(),
       type: "button",
       content: "Signup Now",
-      class: "draggable",
+      position: {
+        position: "absolute",
+        top: "250px",
+        left: "90px",
+      },
       style: {
-        position: "relative",
-        top: "100px",
-        width: "100%",
-        maxWidth: "354px",
-        padding: "12px 16px",
+        width: "150px",
+        padding: "10px 12px",
         borderRadius: "16px",
         textTransform: "uppercase",
         color: "#fff",
@@ -141,49 +262,55 @@ function getDefaultElements() {
         fontWeight: 700,
       },
     },
-    {
-      id: uniqueId(),
-      type: "text",
-      content: "No credit card required. No surprises",
-      class: "draggable",
-      style: {
-        position: "relative",
-        top: "110px",
-        color: "#fff",
-      },
-    },
   ];
 }
 
+function getPopupStorageKey() {
+  return device.value == "desktop" ? "popup" : "mobile_popup";
+}
+function getElementsStorageKey() {
+  return device.value == "desktop" ? "elements" : "mobile_elements";
+}
+
 function addText() {
-  elements.push({
+  let element = {
     id: uniqueId(),
     type: "text",
     content: "Sample text",
-    class: "draggable",
-    style: {
-      position: "relative",
+    position: {
+      position: "absolute",
       top: getPosition(),
-      maxWidth: "354px",
+      left: getPosition(),
+    },
+    style: {
+      width: "354px",
       textAlign: "center",
       color: "#fff",
       fontSize: "26px",
       fontWeight: "bold",
     },
-  });
+  };
+  if (device.value == "mobile") {
+    element.style.width = "300px";
+    element.style.fontSize = "16px";
+  }
+  elements.push(element);
+
+  initDraggable();
 }
 
 function addButton() {
-  elements.push({
+  let element = {
     id: uniqueId(),
     type: "button",
     content: "Signup Now",
-    class: "draggable",
-    style: {
-      position: "relative",
+    position: {
+      position: "absolute",
       top: getPosition(),
-      width: "100%",
-      maxWidth: "354px",
+      left: getPosition(),
+    },
+    style: {
+      width: "354px",
       padding: "12px 16px",
       borderRadius: "16px",
       textTransform: "uppercase",
@@ -191,7 +318,15 @@ function addButton() {
       fontSize: "16px",
       fontWeight: 700,
     },
-  });
+  };
+
+  if (device.value == "mobile") {
+    element.style.width = "150px";
+  }
+
+  elements.push(element);
+
+  initDraggable();
 }
 
 async function addImage() {
@@ -204,12 +339,19 @@ async function addImage() {
     type: "image",
     src: convertedFile,
     alt: "stars",
-    class: "draggable",
-    style: {
-      position: "relative",
+    position: {
+      position: "absolute",
       top: getPosition(),
+      left: getPosition(),
+    },
+    style: {
+      width: "100px",
+      height: "100px",
+      objectFit: "cover",
     },
   });
+
+  initDraggable();
 
   imageModal = false;
 }
@@ -228,7 +370,7 @@ function toBase64() {
     };
 
     // Read the file as Data URL
-    reader.readAsDataURL(file.value);
+    reader.readAsDataURL(image.value);
   });
 }
 
@@ -244,8 +386,60 @@ function uniqueId() {
   return Math.random().toString(36).slice(2);
 }
 
+function initDraggable() {
+  nextTick(() => {
+    let elements = document.querySelectorAll(".draggable");
+
+    for (let i = 0; i < elements.length; i++) {
+      draggable(elements[i]);
+    }
+  });
+}
+
+function draggable(draggableElem) {
+  let initialX = 0;
+  let initialY = 0;
+  let moveElement = false;
+
+  draggableElem.addEventListener("mousedown", (e) => {
+    e.preventDefault();
+    //initial x and y points
+    initialX = e.clientX;
+    initialY = e.clientY;
+
+    //Start movement
+    moveElement = true;
+  });
+
+  draggableElem.addEventListener("mousemove", (e) => {
+    e.preventDefault();
+
+    let element = elements.find((element) => element.id == draggableElem.id);
+
+    //if movement == true then set top and left to new X andY while removing any offset
+    if (moveElement && element) {
+      element.position.top =
+        draggableElem.offsetTop - (initialY - e.clientY) + "px";
+      element.position.left =
+        draggableElem.offsetLeft - (initialX - e.clientX) + "px";
+      initialX = e.clientX;
+      initialY = e.clientY;
+    }
+  });
+
+  draggableElem.addEventListener("mouseup", (e) => (moveElement = false));
+  draggableElem.addEventListener("mouseleave", (e) => (moveElement = false));
+}
+
 function getPosition() {
-  return console.log(Math.floor(Math.random() * 10)) + "px";
+  return Math.floor(Math.random() * 100) + "px";
+}
+
+function switchDevice(screen) {
+  savePopup();
+  device.value = screen;
+  setPopupData();
+  setPopupElements();
 }
 
 watch(
@@ -261,13 +455,12 @@ watch(
   () => popup.height,
   (newValue) => {
     if (!popup.constrains || newValue == popup.width) return;
-
     popup.width = newValue;
   }
 );
 
 watch(
-  () => file.value,
+  () => image.value,
   (newVal) => {
     if (newVal) {
       addImage();
@@ -277,7 +470,7 @@ watch(
 </script>
 
 <template>
-  <div class="lg:flex gap-7 px-6 lg:px-8 pt-7">
+  <div class="lg:flex gap-7 px-6 lg:px-8 pt-7 obje">
     <!-- sidebar controlls -->
     <div class="w-full lg:w-[464px] mb-4 lg:mb-0">
       <!-- General Settings -->
@@ -466,25 +659,49 @@ watch(
     </div>
 
     <!-- popup contents -->
-    <div class="flex-auto">
+    <div class="flex-auto w-full">
       <div
         class="sticky top-[110px] bg-white shadow rounded-lg overflow-x-auto"
       >
-        <div class="flex items-center justify-end gap-2">
-          <button
-            @click="previewModal = true"
-            class="px-4 py-2 text-secondary text-sm font-medium"
-          >
-            Preview
-          </button>
-          <button
-            @click="savePopup"
-            class="px-4 py-2 bg-secondary text-sm font-medium text-white rounded-bl-xl"
-          >
-            Save
-          </button>
+        <div class="flex items-center justify-between p-2">
+          <div class="flex items-center gap-6 text-xs">
+            <button
+              @click="switchDevice('mobile')"
+              class="grid place-items-center hover:text-secondary"
+              :class="{ 'text-secondary': device == 'mobile' }"
+            >
+              <DevicePhoneMobileIcon class="w-5 h-5"></DevicePhoneMobileIcon>
+              <span>Phone</span>
+            </button>
+            <button
+              @click="switchDevice('desktop')"
+              class="grid place-items-center hover:text-secondary"
+              :class="{ 'text-secondary': device == 'desktop' }"
+            >
+              <ComputerDesktopIcon class="w-5 h-5"></ComputerDesktopIcon>
+              <span>Desktop</span>
+            </button>
+          </div>
+          <div class="flex items-center gap-2 hover:text-primary">
+            <button
+              @click="previewModal = true"
+              class="px-4 py-2 text-secondary text-sm font-medium"
+            >
+              Preview
+            </button>
+            <button
+              @click="savePopup"
+              class="px-4 py-2 bg-secondary text-sm font-medium text-white rounded-bl-lg rounded-tr-lg"
+            >
+              Save
+            </button>
+          </div>
         </div>
-        <div class="grid place-items-center min-h-[calc(100vh-150px)]">
+        <div
+          @click.stop="openMenu = false"
+          :class="{ 'mobile-device': device == 'mobile' }"
+          class="relative grid place-items-center min-h-[calc(100vh-150px)]"
+        >
           <div
             class="relative grid place-items-center rounded-full"
             :style="{
@@ -502,8 +719,16 @@ watch(
             >
               <div
                 v-for="element in elements"
-                :class="element.class"
-                class="relative flex flex-col items-center group"
+                :id="element.id"
+                :class="[
+                  'draggable',
+                  element.id == openMenu
+                    ? 'border-secondary bg-secondary/10'
+                    : 'border-transparent ',
+                ]"
+                :style="element.position"
+                @click.stop="openActionMenu(element.id)"
+                class="flex flex-col items-center border-2 p-2 border-dashed rounded-sm"
               >
                 <img
                   v-if="element.type == 'image'"
@@ -524,6 +749,7 @@ watch(
                   :style="element.style"
                   :type="element.inputType"
                   :placeholder="element.placeholder"
+                  @mousedown.stop
                 />
 
                 <button
@@ -531,13 +757,22 @@ watch(
                   class="btn-submit focus:outline-none"
                   :style="[btnStyle, element.style]"
                   v-html="element.content"
+                  @mousedown.stop
                 ></button>
-                <button
-                  @click="removeElement(element)"
-                  class="absolute right-12 mt-4 p-2 text-red-500 bg-gray-100 rounded-full hidden group-hover:block"
+                <div
+                  v-show="openMenu == element.id"
+                  class="absolute -bottom-8 -right-12 z-10 flex items-center gap-1"
                 >
-                  <TrashIcon class="w-5 h-5"></TrashIcon>
-                </button>
+                  <button class="p-2 text-red-500 bg-gray-100 rounded-full">
+                    <DragIcon class="w-6 h-6"></DragIcon>
+                  </button>
+                  <button
+                    @click="removeElement(element)"
+                    class="p-2 text-red-500 bg-gray-100 rounded-full"
+                  >
+                    <TrashIcon class="w-5 h-5"></TrashIcon>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -555,14 +790,16 @@ watch(
 
   <Popup :open="imageModal" @close="imageModal = false">
     <div class="bg-white p-8 rounded-lg">
-      <Fileupload v-model="file"></Fileupload>
+      <Fileupload v-model="image"></Fileupload>
     </div>
   </Popup>
+
   <Popup :open="previewModal" @close="previewModal = false">
-    <div class="grid place-items-center min-h-[calc(100vh-150px)]">
+    <div class="relative grid place-items-center min-h-[calc(100vh-150px)]">
       <div
-        class="relative grid place-items-center rounded-full"
+        class="grid place-items-center rounded-full"
         :style="{
+          position: 'absolute',
           width: popup.width + 'px',
           height: popup.height + 'px',
           backgroundColor: popup.bg_color,
@@ -577,8 +814,9 @@ watch(
         >
           <div
             v-for="element in elements"
-            :class="element.class"
-            class="flex flex-col items-center group"
+            :id="element.id"
+            :style="element.position"
+            class="flex flex-col items-center p-2"
           >
             <img
               v-if="element.type == 'image'"
@@ -614,11 +852,47 @@ watch(
   </Popup>
 </template>
 
-<style>
+<style scoped>
 .btn-submit {
   background-color: var(--color);
 }
 .btn-submit:hover {
   background-color: var(--color-hover);
+}
+.mobile-device {
+  max-width: calc(443px - 2 * 12px);
+  height: calc(698px - 2 * 12px + 43px);
+  position: relative;
+  padding-top: 43px;
+  margin: auto;
+  border: 12px solid #000;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+.mobile-device:before {
+  content: "";
+  background: #000;
+  width: 180px;
+  height: 28px;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 0 0 15px 15px;
+}
+.mobile-device:after {
+  content: "";
+  display: block;
+  background: #000;
+  width: calc(180px + 2 * 15px);
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translateX(-50%);
+  height: 15px;
+  --mask: radial-gradient(15px at 15px 100%, #0000 98%, #000) calc(-1 * 15px);
+  -webkit-mask: var(--mask);
+  mask: var(--mask);
 }
 </style>
