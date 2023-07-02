@@ -45,17 +45,6 @@ function openActionMenu(id) {
   openMenu.value = id;
 }
 
-function savePopup() {
-  try {
-    localStorage.setItem(getPopupStorageKey(), JSON.stringify(popup));
-    localStorage.setItem(getElementsStorageKey(), JSON.stringify(elements));
-
-    saveSuceess.value = true;
-  } catch (error) {
-    console.log(error);
-  }
-}
-
 function setPopupData() {
   let savedPopup = localStorage.getItem(getPopupStorageKey());
 
@@ -266,6 +255,17 @@ function getDefaultElements() {
   ];
 }
 
+function savePopup() {
+  try {
+    localStorage.setItem(getPopupStorageKey(), JSON.stringify(popup));
+    localStorage.setItem(getElementsStorageKey(), JSON.stringify(elements));
+
+    saveSuceess.value = true;
+  } catch (error) {
+    console.log(error);
+  }
+}
+
 function getPopupStorageKey() {
   return device.value == "desktop" ? "popup" : "mobile_popup";
 }
@@ -387,6 +387,10 @@ function uniqueId() {
   return Math.random().toString(36).slice(2);
 }
 
+function getPosition() {
+  return Math.floor(Math.random() * 100) + "px";
+}
+
 function initDraggable() {
   nextTick(() => {
     let elements = document.querySelectorAll(".draggable");
@@ -430,10 +434,6 @@ function draggable(draggableElem) {
 
   draggableElem.addEventListener("mouseup", (e) => (moveElement = false));
   draggableElem.addEventListener("mouseleave", (e) => (moveElement = false));
-}
-
-function getPosition() {
-  return Math.floor(Math.random() * 100) + "px";
 }
 
 function switchDevice(screen) {
