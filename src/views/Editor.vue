@@ -5,6 +5,7 @@ import Fileupload from "../components/Fileupload.vue";
 import Toast from "../components/Toast.vue";
 import Popup from "../components/Popup.vue";
 import DragIcon from "../components/icons/Drag.vue";
+import TextIcon from "../components/icons/Text.vue";
 import {
   ChevronUpIcon,
   QuestionMarkCircleIcon,
@@ -615,19 +616,7 @@ watch(
                 class="grid place-items-center p-5 rounded-lg shadow"
               >
                 <span class="border border-gray-400 rounded-full p-3">
-                  <svg
-                    class="w-4 h-4"
-                    viewBox="0 0 18 18"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2 5h1V2h5v14H5v1h7v-1H9V2h5v3h1V1H2v4z"
-                      fill-rule="nonzero"
-                      fill-opacity="1"
-                      fill="currentColor"
-                      stroke="none"
-                    ></path>
-                  </svg>
+                  <TextIcon class="w-4 h-4"></TextIcon>
                 </span>
                 <p class="mt-2 text-sm">Text</p>
               </button>
