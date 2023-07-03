@@ -282,7 +282,8 @@ function addText() {
     content: "Sample text",
     position: {
       position: "relative",
-      top: "-300px",
+      top: "0px",
+      left: "0px",
     },
     style: {
       width: "354px",
@@ -308,7 +309,8 @@ function addButton() {
     content: "Signup Now",
     position: {
       position: "relative",
-      top: "-300px",
+      top: "0px",
+      left: "0px",
     },
     style: {
       width: "354px",
@@ -343,7 +345,8 @@ async function addImage() {
     alt: "stars",
     position: {
       position: "relative",
-      top: "-300px",
+      top: "0px",
+      left: "0px",
     },
   });
 
