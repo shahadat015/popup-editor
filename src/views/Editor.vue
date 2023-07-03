@@ -164,6 +164,7 @@ function getDefaultElements() {
           color: "#fff",
           fontSize: "16px",
           fontWeight: 700,
+          textAlign: "center",
         },
       },
       {
@@ -250,6 +251,7 @@ function getDefaultElements() {
         color: "#fff",
         fontSize: "16px",
         fontWeight: 700,
+        textAlign: "center",
       },
     },
   ];
@@ -318,6 +320,7 @@ function addButton() {
       color: "#fff",
       fontSize: "16px",
       fontWeight: 700,
+      textAlign: "center",
     },
   };
 
@@ -345,16 +348,11 @@ async function addImage() {
       top: getPosition(),
       left: getPosition(),
     },
-    style: {
-      width: "100px",
-      height: "100px",
-      objectFit: "cover",
-    },
   });
 
   initDraggable();
 
-  imageModal = false;
+  imageModal.value = false;
 }
 
 function toBase64() {
@@ -393,10 +391,10 @@ function getPosition() {
 
 function initDraggable() {
   nextTick(() => {
-    let elements = document.querySelectorAll(".draggable");
+    let draggableElements = document.querySelectorAll(".draggable");
 
-    for (let i = 0; i < elements.length; i++) {
-      draggable(elements[i]);
+    for (let i = 0; i < draggableElements.length; i++) {
+      draggable(draggableElements[i]);
     }
   });
 }
@@ -441,6 +439,10 @@ function switchDevice(screen) {
   device.value = screen;
   setPopupData();
   setPopupElements();
+}
+
+function updateContent(e, element) {
+  element.content = e.target.textContent;
 }
 
 watch(
@@ -724,12 +726,17 @@ watch(
                   :style="element.style"
                   :src="element.src"
                   :alt="element.alt"
+                  @mousedown.stop
                 />
 
                 <div
                   v-if="element.type == 'text'"
                   :style="element.style"
-                  v-html="element.content"
+                  v-text="element.content"
+                  @input="updateContent($event, element)"
+                  @mousedown.stop
+                  contenteditable="true"
+                  :key="element.id"
                 ></div>
 
                 <input
@@ -741,18 +748,23 @@ watch(
                   @mousedown.stop
                 />
 
-                <button
+                <div
                   v-if="element.type == 'button'"
-                  class="btn-submit focus:outline-none"
+                  class="btn-submit"
                   :style="[btnStyle, element.style]"
-                  v-html="element.content"
+                  v-text="element.content"
+                  @input="updateContent($event, element)"
+                  :key="element.id"
+                  contenteditable="true"
                   @mousedown.stop
-                ></button>
+                ></div>
                 <div
                   v-show="openMenu == element.id"
                   class="absolute -bottom-8 -right-12 z-10 flex items-center gap-1"
                 >
-                  <button class="p-2 text-red-500 bg-gray-100 rounded-full">
+                  <button
+                    class="p-2 text-red-500 bg-gray-100 rounded-full cursor-move"
+                  >
                     <DragIcon class="w-6 h-6"></DragIcon>
                   </button>
                   <button
@@ -883,5 +895,9 @@ watch(
   --mask: radial-gradient(15px at 15px 100%, #0000 98%, #000) calc(-1 * 15px);
   -webkit-mask: var(--mask);
   mask: var(--mask);
+}
+
+[contenteditable] {
+  outline: 0px solid transparent;
 }
 </style>
