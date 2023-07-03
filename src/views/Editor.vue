@@ -104,9 +104,9 @@ function getDefaultElements() {
         src: "/stars.png",
         alt: "stars",
         position: {
-          position: "absolute",
-          top: "30px",
-          left: "160px",
+          position: "relative",
+          top: "22px",
+          left: "0px",
         },
         style: {
           width: "145px",
@@ -119,9 +119,9 @@ function getDefaultElements() {
         content:
           "All the text and elements in this popup should be editable and draggable",
         position: {
-          position: "absolute",
-          top: "100px",
-          left: "60px",
+          position: "relative",
+          top: "20px",
+          left: "0px",
         },
         style: {
           width: "354px",
@@ -137,9 +137,9 @@ function getDefaultElements() {
         inputType: "email",
         placeholder: "E-mail",
         position: {
-          position: "absolute",
-          top: "230px",
-          left: "60px",
+          position: "relative",
+          top: "20px",
+          left: "0px",
         },
         style: {
           width: "354px",
@@ -152,9 +152,9 @@ function getDefaultElements() {
         type: "button",
         content: "Signup Now",
         position: {
-          position: "absolute",
-          top: "300px",
-          left: "60px",
+          position: "relative",
+          top: "20px",
+          left: "0px",
         },
         style: {
           width: "354px",
@@ -172,9 +172,9 @@ function getDefaultElements() {
         type: "text",
         content: "No credit card required. No surprises",
         position: {
-          position: "absolute",
-          top: "360px",
-          left: "90px",
+          position: "relative",
+          top: "10px",
+          left: "0px",
         },
         style: {
           color: "#fff",
@@ -191,9 +191,9 @@ function getDefaultElements() {
       src: "/stars.png",
       alt: "stars",
       position: {
-        position: "absolute",
-        top: "20px",
-        left: "90px",
+        position: "relative",
+        top: "10px",
+        left: "0px",
       },
       style: {
         width: "145px",
@@ -206,9 +206,9 @@ function getDefaultElements() {
       content:
         "All the text and elements in this popup should be editable and draggable",
       position: {
-        position: "absolute",
-        top: "80px",
-        left: "15px",
+        position: "relative",
+        top: "10px",
+        left: "0px",
       },
       style: {
         width: "300px",
@@ -224,9 +224,9 @@ function getDefaultElements() {
       inputType: "email",
       placeholder: "E-mail",
       position: {
-        position: "absolute",
-        top: "185px",
-        left: "25px",
+        position: "relative",
+        top: "10px",
+        left: "0px",
       },
       style: {
         width: "280px",
@@ -239,9 +239,9 @@ function getDefaultElements() {
       type: "button",
       content: "Signup Now",
       position: {
-        position: "absolute",
-        top: "250px",
-        left: "90px",
+        position: "relative",
+        top: "10px",
+        left: "0px",
       },
       style: {
         width: "150px",
@@ -281,9 +281,8 @@ function addText() {
     type: "text",
     content: "Sample text",
     position: {
-      position: "absolute",
-      top: getPosition(),
-      left: getPosition(),
+      position: "relative",
+      top: "-300px",
     },
     style: {
       width: "354px",
@@ -308,9 +307,8 @@ function addButton() {
     type: "button",
     content: "Signup Now",
     position: {
-      position: "absolute",
-      top: getPosition(),
-      left: getPosition(),
+      position: "relative",
+      top: "-300px",
     },
     style: {
       width: "354px",
@@ -344,9 +342,8 @@ async function addImage() {
     src: convertedFile,
     alt: "stars",
     position: {
-      position: "absolute",
-      top: getPosition(),
-      left: getPosition(),
+      position: "relative",
+      top: "-300px",
     },
   });
 
@@ -385,53 +382,21 @@ function uniqueId() {
   return Math.random().toString(36).slice(2);
 }
 
-function getPosition() {
-  return Math.floor(Math.random() * 100) + "px";
-}
-
 function initDraggable() {
   nextTick(() => {
-    let draggableElements = document.querySelectorAll(".draggable");
-
-    for (let i = 0; i < draggableElements.length; i++) {
-      draggable(draggableElements[i]);
-    }
+    $(".draggable").draggable({
+      addClasses: false,
+      containment: "editor",
+      handle: ".handle",
+      stop(event, ui) {
+        let element = elements.find((element) => element.id == event.target.id);
+        if (element) {
+          element.position.top = ui.position.top + "px";
+          element.position.left = ui.position.left + "px";
+        }
+      },
+    });
   });
-}
-
-function draggable(draggableElem) {
-  let initialX = 0;
-  let initialY = 0;
-  let moveElement = false;
-
-  draggableElem.addEventListener("mousedown", (e) => {
-    e.preventDefault();
-    //initial x and y points
-    initialX = e.clientX;
-    initialY = e.clientY;
-
-    //Start movement
-    moveElement = true;
-  });
-
-  draggableElem.addEventListener("mousemove", (e) => {
-    e.preventDefault();
-
-    let element = elements.find((element) => element.id == draggableElem.id);
-
-    //if movement == true then set top and left to new X andY while removing any offset
-    if (moveElement && element) {
-      element.position.top =
-        draggableElem.offsetTop - (initialY - e.clientY) + "px";
-      element.position.left =
-        draggableElem.offsetLeft - (initialX - e.clientX) + "px";
-      initialX = e.clientX;
-      initialY = e.clientY;
-    }
-  });
-
-  draggableElem.addEventListener("mouseup", (e) => (moveElement = false));
-  draggableElem.addEventListener("mouseleave", (e) => (moveElement = false));
 }
 
 function switchDevice(screen) {
@@ -439,6 +404,7 @@ function switchDevice(screen) {
   device.value = screen;
   setPopupData();
   setPopupElements();
+  initDraggable();
 }
 
 function updateContent(e, element) {
@@ -652,7 +618,7 @@ watch(
     <!-- popup contents -->
     <div class="flex-auto w-full">
       <div
-        class="sticky top-[110px] bg-white shadow rounded-lg overflow-x-auto"
+        class="sticky top-[110px] bg-white shadow rounded-lg overflow-x-auto sm:overflow-hidden"
       >
         <div class="flex items-center justify-between p-2">
           <div class="flex items-center gap-6 text-xs">
@@ -688,10 +654,11 @@ watch(
             </button>
           </div>
         </div>
+        <!-- :class="{ 'mobile-device': device == 'mobile' }" -->
         <div
-          @click.stop="openMenu = false"
+          @click="openMenu = false"
           :class="{ 'mobile-device': device == 'mobile' }"
-          class="relative grid place-items-center min-h-[calc(100vh-150px)]"
+          class="editor grid place-items-center min-h-[calc(100vh-150px)]"
         >
           <div
             class="relative grid place-items-center rounded-full"
@@ -710,16 +677,16 @@ watch(
             >
               <div
                 v-for="element in elements"
+                :key="element.id"
                 :id="element.id"
-                :class="[
-                  'draggable',
-                  element.id == openMenu
-                    ? 'border-secondary bg-secondary/10'
-                    : 'border-transparent ',
-                ]"
                 :style="element.position"
                 @click.stop="openActionMenu(element.id)"
-                class="flex flex-col items-center border-2 p-2 border-dashed rounded-sm"
+                :class="
+                  element.id == openMenu
+                    ? 'border-secondary bg-secondary/10'
+                    : 'border-transparent '
+                "
+                class="draggable flex flex-col items-center border-2 p-2 border-dashed rounded-sm"
               >
                 <img
                   v-if="element.type == 'image'"
@@ -736,7 +703,6 @@ watch(
                   @input="updateContent($event, element)"
                   @mousedown.stop
                   contenteditable="true"
-                  :key="element.id"
                 ></div>
 
                 <input
@@ -754,26 +720,23 @@ watch(
                   :style="[btnStyle, element.style]"
                   v-text="element.content"
                   @input="updateContent($event, element)"
-                  :key="element.id"
                   contenteditable="true"
                   @mousedown.stop
                 ></div>
-                <div
-                  v-show="openMenu == element.id"
-                  class="absolute -bottom-8 -right-12 z-10 flex items-center gap-1"
+
+                <span
+                  v-if="element.id == openMenu"
+                  class="handle absolute -bottom-10 right-5 z-10 p-2 text-secondary bg-gray-100 rounded-full cursor-move"
                 >
-                  <button
-                    class="p-2 text-red-500 bg-gray-100 rounded-full cursor-move"
-                  >
-                    <DragIcon class="w-6 h-6"></DragIcon>
-                  </button>
-                  <button
-                    @click="removeElement(element)"
-                    class="p-2 text-red-500 bg-gray-100 rounded-full"
-                  >
-                    <TrashIcon class="w-5 h-5"></TrashIcon>
-                  </button>
-                </div>
+                  <DragIcon class="w-6 h-6"></DragIcon>
+                </span>
+                <span
+                  v-if="element.id == openMenu"
+                  class="handle absolute -bottom-10 -right-5 z-10 p-2 text-red-500 bg-gray-100 rounded-full cursor-move"
+                  @click="removeElement(element)"
+                >
+                  <TrashIcon class="w-5 h-5"></TrashIcon>
+                </span>
               </div>
             </div>
           </div>
@@ -796,57 +759,54 @@ watch(
   </Popup>
 
   <Popup :open="previewModal" @close="previewModal = false">
-    <div class="relative grid place-items-center min-h-[calc(100vh-150px)]">
+    <div
+      class="relative grid place-items-center rounded-full"
+      :style="{
+        width: popup.width + 'px',
+        height: popup.height + 'px',
+        backgroundColor: popup.bg_color,
+      }"
+    >
       <div
-        class="grid place-items-center rounded-full"
+        class="rounded-full border-4 border-white"
         :style="{
-          position: 'absolute',
-          width: popup.width + 'px',
-          height: popup.height + 'px',
-          backgroundColor: popup.bg_color,
+          width: popup.width - popup.padding + 'px',
+          height: popup.height - popup.padding + 'px',
         }"
       >
         <div
-          class="rounded-full border-4 border-white"
-          :style="{
-            width: popup.width - popup.padding + 'px',
-            height: popup.height - popup.padding + 'px',
-          }"
+          v-for="element in elements"
+          :key="element.id"
+          :style="element.position"
+          class="flex flex-col items-center p-3"
         >
+          <img
+            v-if="element.type == 'image'"
+            :style="element.style"
+            :src="element.src"
+            :alt="element.alt"
+          />
+
           <div
-            v-for="element in elements"
-            :id="element.id"
-            :style="element.position"
-            class="flex flex-col items-center p-2"
-          >
-            <img
-              v-if="element.type == 'image'"
-              :style="element.style"
-              :src="element.src"
-              :alt="element.alt"
-            />
+            v-if="element.type == 'text'"
+            :style="element.style"
+            v-text="element.content"
+          ></div>
 
-            <div
-              v-if="element.type == 'text'"
-              :style="element.style"
-              v-html="element.content"
-            ></div>
+          <input
+            v-if="element.type == 'input'"
+            class="focus:outline-none"
+            :style="element.style"
+            :type="element.inputType"
+            :placeholder="element.placeholder"
+          />
 
-            <input
-              v-if="element.type == 'input'"
-              class="focus:outline-none"
-              :style="element.style"
-              :type="element.inputType"
-              :placeholder="element.placeholder"
-            />
-
-            <button
-              v-if="element.type == 'button'"
-              class="btn-submit focus:outline-none"
-              :style="[btnStyle, element.style]"
-              v-html="element.content"
-            ></button>
-          </div>
+          <div
+            v-if="element.type == 'button'"
+            class="btn-submit"
+            :style="[btnStyle, element.style]"
+            v-text="element.content"
+          ></div>
         </div>
       </div>
     </div>
