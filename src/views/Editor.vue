@@ -657,7 +657,7 @@ watch(
             </button>
           </div>
         </div>
-        <!-- :class="{ 'mobile-device': device == 'mobile' }" -->
+
         <div
           @click="openMenu = false"
           :class="{ 'mobile-device': device == 'mobile' }"
