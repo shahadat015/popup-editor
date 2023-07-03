@@ -735,7 +735,7 @@ watch(
                 </span>
                 <span
                   v-if="element.id == openMenu"
-                  class="handle absolute -bottom-10 -right-5 z-10 p-2 text-red-500 bg-gray-100 rounded-full cursor-move"
+                  class="handle absolute -bottom-10 -right-5 z-10 p-2 text-red-500 bg-gray-100 rounded-full cursor-pointer"
                   @click="removeElement(element)"
                 >
                   <TrashIcon class="w-5 h-5"></TrashIcon>
