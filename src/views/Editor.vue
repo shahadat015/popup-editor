@@ -389,7 +389,7 @@ function initDraggable() {
   nextTick(() => {
     $(".draggable").draggable({
       addClasses: false,
-      containment: "editor",
+      containment: ".editor",
       handle: ".handle",
       stop(event, ui) {
         let element = elements.find((element) => element.id == event.target.id);
