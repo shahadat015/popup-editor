@@ -727,13 +727,13 @@ watch(
 
                 <span
                   v-if="element.id == openMenu"
-                  class="handle absolute -bottom-10 right-5 z-10 p-2 text-secondary bg-gray-100 rounded-full cursor-move"
+                  class="handle absolute -bottom-10 right-8 z-10 p-2 text-secondary bg-gray-100 rounded-full cursor-move"
                 >
-                  <DragIcon class="w-6 h-6"></DragIcon>
+                  <DragIcon class="w-5 h-5"></DragIcon>
                 </span>
                 <span
                   v-if="element.id == openMenu"
-                  class="handle absolute -bottom-10 -right-5 z-10 p-2 text-red-500 bg-gray-100 rounded-full cursor-pointer"
+                  class="handle absolute -bottom-10 -right-2 z-10 p-2 text-red-500 bg-gray-100 rounded-full cursor-pointer"
                   @click="removeElement(element)"
                 >
                   <TrashIcon class="w-5 h-5"></TrashIcon>
