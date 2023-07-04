@@ -282,7 +282,7 @@ function addText() {
     content: "Sample text",
     position: {
       position: "relative",
-      top: "0px",
+      top: "-350px",
       left: "0px",
     },
     style: {
@@ -309,7 +309,7 @@ function addButton() {
     content: "Signup Now",
     position: {
       position: "relative",
-      top: "0px",
+      top: "-350px",
       left: "0px",
     },
     style: {
@@ -345,7 +345,7 @@ async function addImage() {
     alt: "stars",
     position: {
       position: "relative",
-      top: "0px",
+      top: "-350px",
       left: "0px",
     },
   });
@@ -620,9 +620,7 @@ watch(
 
     <!-- popup contents -->
     <div class="flex-auto w-full">
-      <div
-        class="sticky top-[110px] bg-white shadow rounded-lg overflow-x-auto sm:overflow-hidden"
-      >
+      <div class="sticky top-[110px] bg-white shadow rounded-lg overflow-auto">
         <div class="flex items-center justify-between p-2">
           <div class="flex items-center gap-6 text-xs">
             <button
